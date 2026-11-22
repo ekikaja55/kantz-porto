@@ -18,17 +18,17 @@ Modern, high-performance personal portfolio and engineering showcase web applica
 
 ## Tech Stack Overview
 
-| Layer | Technology |
-|---|---|
-| Frontend Framework | SvelteKit (Svelte 5 Runes) |
-| Styling | Tailwind CSS v4 |
-| Database & ORM | PostgreSQL (Supabase) + Drizzle ORM |
-| Authentication | Better Auth |
-| Caching & Rate Limiting | Upstash Redis |
-| Icons | `@iconify/svelte` (Solar Icons / Phosphor Duotone) |
-| Fonts | Self-hosted WOFF2 (Plus Jakarta Sans) |
-| Testing | Vitest + Playwright |
-| Deployment | Vercel (`@sveltejs/adapter-vercel`) |
+| Layer                   | Technology                                         |
+| ----------------------- | -------------------------------------------------- |
+| Frontend Framework      | SvelteKit (Svelte 5 Runes)                         |
+| Styling                 | Tailwind CSS v4                                    |
+| Database & ORM          | PostgreSQL (Supabase) + Drizzle ORM                |
+| Authentication          | Better Auth                                        |
+| Caching & Rate Limiting | Upstash Redis                                      |
+| Icons                   | `@iconify/svelte` (Solar Icons / Phosphor Duotone) |
+| Fonts                   | Self-hosted WOFF2 (Plus Jakarta Sans)              |
+| Testing                 | Vitest + Playwright                                |
+| Deployment              | Vercel (`@sveltejs/adapter-vercel`)                |
 
 ---
 
@@ -80,6 +80,7 @@ cp .env.example .env
 ```
 
 Required environment variables:
+
 - `DATABASE_URL`: PostgreSQL connection string (Supabase)
 - `ORIGIN`: Base URL (e.g. `http://localhost:5173` for development)
 - `BETTER_AUTH_SECRET`: High-entropy secret key for Better Auth
@@ -120,3 +121,7 @@ npm run build
 - [TODO.md](file:///home/ekik/workspace2/kantz-porto/TODO.md) - Project roadmap and milestone tracker
 - [AGENTS.md](file:///home/ekik/workspace2/kantz-porto/AGENTS.md) - Coding standards, persona guidelines, and anti-slop rules
 - [DESIGN.md](file:///home/ekik/workspace2/kantz-porto/DESIGN.md) - Design system specification and color palette draft
+
+## Agents Figcraft Live Mode
+
+figcraft --control 47800
