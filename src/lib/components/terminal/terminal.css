@@ -1,0 +1,696 @@
+/*
+ * terminal.css: Scoped tokens, atmosphere, and motion engine for kantZ Workstation Terminal UI
+ *
+ * Palette credits:
+ * - Moonfly:  bluz71/vim-moonfly-colors (MIT License)
+ * - Ayu Dark: ayu-theme/ayu-colors (MIT License, Copyright (c) 2017 Ike Kurghinyan)
+ *
+ * moonfly is the base; ayu overrides via :root[data-term-theme="ayu"].
+ * :root:has([data-ui="terminal"]) locks dark color-scheme and background on
+ * html/body only while the terminal shell is mounted, preventing white
+ * overscroll flashes without affecting admin/login mode-watcher.
+ */
+
+:root:has([data-ui='terminal']),
+[data-ui='terminal'] {
+	color-scheme: dark !important;
+	--t-bg: #080808;
+	--t-surface: #121212;
+	--t-border: #323437;
+	--t-fg: #bdbdbd;
+	--t-muted: #949494;
+	--t-faint: #626262;
+	--t-accent: #80a0ff;
+	--t-info: #79dac8;
+	--t-ok: #8cc85f;
+	--t-warn: #e3c78a;
+	--t-danger: #ff5454;
+	--t-special: #ae81ff;
+	--t-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--t-grid-crosshair: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cpath d='M48 44v8M44 48h8' stroke='%2380a0ff' stroke-opacity='0.28' stroke-width='1'/%3E%3C/svg%3E");
+	--t-cursor-idle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M3 3L24 13L15.2 15.6L12.4 24.5L3 3Z' fill='%2380a0ff' stroke='%23080808' stroke-width='2' stroke-linejoin='miter'/%3E%3C/svg%3E") 3 3, default;
+	--t-cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M5 12V5h7M20 5h7v7M27 20v7h-7M12 27H5v-7' fill='none' stroke='%23080808' stroke-width='4' stroke-linecap='square'/%3E%3Cpath d='M5 12V5h7M20 5h7v7M27 20v7h-7M12 27H5v-7' fill='none' stroke='%2379dac8' stroke-width='2' stroke-linecap='square'/%3E%3Crect x='13.5' y='13.5' width='5' height='5' fill='%2379dac8' stroke='%23080808' stroke-width='1.2'/%3E%3C/svg%3E") 16 16, pointer;
+}
+
+:root[data-term-theme='ayu']:has([data-ui='terminal']),
+:root[data-term-theme='ayu'] [data-ui='terminal'] {
+	--t-bg: #0b0e14;
+	--t-surface: #10141c;
+	--t-border: #273747;
+	--t-fg: #bfbdb6;
+	--t-muted: #8a9199;
+	--t-faint: #626a73;
+	--t-accent: #e6b450;
+	--t-info: #59c2ff;
+	--t-ok: #7fd962;
+	--t-warn: #ff8f40;
+	--t-danger: #f07178;
+	--t-special: #d2a6ff;
+	--t-grid-crosshair: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cpath d='M48 44v8M44 48h8' stroke='%23e6b450' stroke-opacity='0.28' stroke-width='1'/%3E%3C/svg%3E");
+	--t-cursor-idle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M3 3L24 13L15.2 15.6L12.4 24.5L3 3Z' fill='%23e6b450' stroke='%230b0e14' stroke-width='2' stroke-linejoin='miter'/%3E%3C/svg%3E") 3 3, default;
+	--t-cursor-pointer: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M5 12V5h7M20 5h7v7M27 20v7h-7M12 27H5v-7' fill='none' stroke='%230b0e14' stroke-width='4' stroke-linecap='square'/%3E%3Cpath d='M5 12V5h7M20 5h7v7M27 20v7h-7M12 27H5v-7' fill='none' stroke='%2359c2ff' stroke-width='2' stroke-linecap='square'/%3E%3Crect x='13.5' y='13.5' width='5' height='5' fill='%2359c2ff' stroke='%230b0e14' stroke-width='1.2'/%3E%3C/svg%3E") 16 16, pointer;
+}
+
+:root:has([data-ui='terminal']),
+:root:has([data-ui='terminal']) body {
+	background-color: var(--t-bg);
+}
+
+/* Fallback chromatic crossfade when View Transitions API is unavailable */
+[data-ui='terminal'] {
+	transition:
+		background-color 220ms ease,
+		color 180ms ease;
+}
+
+/* Atmospheric GPU-terminal canvas: precision blueprint grid + breathing aurora + diagonal sweep + cursor spotlight */
+[data-ui='terminal'].term-canvas {
+	position: relative;
+	isolation: isolate;
+}
+
+/* Native 0ms-latency custom SVG cursors (desktop pointer-fine only, adaptive Moonfly & Ayu) */
+@media (hover: hover) and (pointer: fine) {
+	[data-ui='terminal'] {
+		cursor: var(--t-cursor-idle);
+	}
+
+	[data-ui='terminal'] a,
+	[data-ui='terminal'] button,
+	[data-ui='terminal'] [role='button'],
+	[data-ui='terminal'] summary,
+	[data-ui='terminal'] label[for],
+	[data-ui='terminal'] .cursor-pointer,
+	[data-ui='terminal'] .term-tree-row {
+		cursor: var(--t-cursor-pointer);
+	}
+
+	[data-ui='terminal'] input,
+	[data-ui='terminal'] textarea,
+	[data-ui='terminal'] [contenteditable='true'] {
+		cursor: text;
+	}
+}
+
+[data-ui='terminal'] .term-bg-stage {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+/* Base layer: 24px dot-matrix + 96px precision '+' crosshairs */
+[data-ui='terminal'] .term-bg-grid {
+	position: absolute;
+	inset: 0;
+	background-image:
+		radial-gradient(
+			circle,
+			color-mix(in srgb, var(--t-border) 62%, transparent) 1px,
+			transparent 1px
+		),
+		var(--t-grid-crosshair);
+	background-size:
+		24px 24px,
+		96px 96px;
+	background-position:
+		0 0,
+		-36px -36px;
+	mask-image: radial-gradient(ellipse 96% 85% at 50% 25%, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.55) 62%, rgba(0, 0, 0, 0.12) 100%);
+	-webkit-mask-image: radial-gradient(
+		ellipse 96% 85% at 50% 25%,
+		rgba(0, 0, 0, 0.95) 0%,
+		rgba(0, 0, 0, 0.55) 62%,
+		rgba(0, 0, 0, 0.12) 100%
+	);
+}
+
+/* Slow breathing top-edge ambient wash (GPU opacity-only) */
+@keyframes term-aurora-breathe {
+	0%,
+	100% {
+		opacity: 0.72;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+[data-ui='terminal'] .term-bg-aurora {
+	position: absolute;
+	inset: 0;
+	background-image:
+		radial-gradient(
+			ellipse 60% 42% at 14% 0%,
+			color-mix(in srgb, var(--t-accent) 10%, transparent),
+			transparent 70%
+		),
+		radial-gradient(
+			ellipse 50% 38% at 88% 4%,
+			color-mix(in srgb, var(--t-special) 8%, transparent),
+			transparent 72%
+		);
+	animation: term-aurora-breathe 14s ease-in-out infinite;
+}
+
+/* Seamless feathered diagonal light sweep across the canvas (zero hard edges, GPU transform/opacity-only) */
+@keyframes term-grid-sweep {
+	0% {
+		transform: translate3d(-42%, -42%, 0);
+		opacity: 0;
+	}
+	12% {
+		opacity: 1;
+	}
+	88% {
+		opacity: 1;
+	}
+	100% {
+		transform: translate3d(42%, 42%, 0);
+		opacity: 0;
+	}
+}
+
+[data-ui='terminal'] .term-bg-sweep {
+	position: absolute;
+	inset: -65vmax;
+	background: linear-gradient(
+		128deg,
+		transparent 38%,
+		color-mix(in srgb, var(--t-accent) 2.5%, transparent) 44%,
+		color-mix(in srgb, var(--t-accent) 6%, transparent) 49%,
+		color-mix(in srgb, var(--t-info) 4.5%, transparent) 52%,
+		color-mix(in srgb, var(--t-info) 2%, transparent) 56%,
+		transparent 62%
+	);
+	will-change: transform, opacity;
+	animation: term-grid-sweep 11s ease-in-out infinite;
+}
+
+/* Cursor-tracking global spotlight orb (zero-repaint GPU translate3d) */
+[data-ui='terminal'] .term-bg-cursor-glow {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 560px;
+	height: 560px;
+	border-radius: 50%;
+	opacity: 0;
+	background: radial-gradient(
+		circle,
+		color-mix(in srgb, var(--t-accent) 11%, transparent) 0%,
+		color-mix(in srgb, var(--t-info) 5.5%, transparent) 38%,
+		transparent 70%
+	);
+	transition: opacity 260ms ease;
+	will-change: transform, opacity;
+}
+
+/* Cursor-illuminated dots pixel-locked to the 24px world grid (zero-repaint GPU translate3d) */
+[data-ui='terminal'] .term-bg-cursor-dots {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 480px;
+	height: 480px;
+	overflow: hidden;
+	opacity: 0;
+	mask-image: radial-gradient(circle, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.45) 45%, transparent 70%);
+	-webkit-mask-image: radial-gradient(
+		circle,
+		rgba(0, 0, 0, 0.95) 0%,
+		rgba(0, 0, 0, 0.45) 45%,
+		transparent 70%
+	);
+	transition: opacity 260ms ease;
+	will-change: transform, opacity;
+}
+
+[data-ui='terminal'] .term-bg-cursor-dots-sheet {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 528px;
+	height: 528px;
+	background-image: radial-gradient(
+		circle,
+		color-mix(in srgb, var(--t-accent) 72%, transparent) 1.25px,
+		transparent 1.25px
+	);
+	background-size: 24px 24px;
+	will-change: transform;
+}
+
+[data-ui='terminal'] .term-bg-stage.term-pointer-active .term-bg-cursor-glow,
+[data-ui='terminal'] .term-bg-stage.term-pointer-active .term-bg-cursor-dots {
+	opacity: 1;
+}
+
+/* View Transitions radial wipe for theme switching (Moonfly <-> Ayu) */
+@keyframes term-theme-wipe {
+	from {
+		clip-path: circle(0% at var(--vt-x, 90%) var(--vt-y, 96%));
+	}
+	to {
+		clip-path: circle(155% at var(--vt-x, 90%) var(--vt-y, 96%));
+	}
+}
+
+html.term-theme-transition::view-transition-old(root),
+html.term-theme-transition::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+}
+
+html.term-theme-transition::view-transition-old(root) {
+	z-index: 1;
+}
+
+html.term-theme-transition::view-transition-new(root) {
+	z-index: 2;
+	animation: term-theme-wipe 420ms var(--t-ease-out) both;
+}
+
+:root:has([data-ui='terminal']),
+[data-ui='terminal'],
+[data-ui='terminal'] * {
+	scrollbar-width: thin;
+	scrollbar-color: var(--t-border) var(--t-bg);
+}
+
+[data-ui='terminal'] a {
+	text-underline-offset: 4px;
+	text-decoration-thickness: 1px;
+	transition:
+		color 150ms ease,
+		border-color 150ms ease,
+		background-color 150ms ease;
+}
+
+[data-ui='terminal'] ::selection {
+	background: var(--t-accent);
+	color: var(--t-bg);
+}
+
+[data-ui='terminal'] :focus-visible {
+	outline: 2px solid var(--t-accent);
+	outline-offset: 2px;
+}
+
+[data-ui='terminal'] .term-input {
+	caret-color: var(--t-accent);
+	caret-shape: block;
+}
+
+[data-ui='terminal'] .term-input:focus-visible {
+	outline: none;
+}
+
+/* Pre-hydration nav strip state from app.html inline script */
+html[data-nav='closed'] [data-ui='terminal'] .term-strip-items {
+	display: none;
+}
+
+/* Crisp output cascade & capped stagger entrance */
+@keyframes term-enter {
+	from {
+		opacity: 0;
+		transform: translateY(7px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+[data-ui='terminal'] .term-enter {
+	animation: term-enter 240ms var(--t-ease-out) both;
+}
+
+[data-ui='terminal'] .term-stagger {
+	animation: term-enter 260ms var(--t-ease-out) both;
+	animation-delay: min(calc(var(--stagger, 0) * 35ms), 175ms);
+}
+
+/* Living terminal block caret (blinks when focused idle; solid while typing) */
+@keyframes term-caret-blink {
+	0%,
+	46% {
+		opacity: 1;
+	}
+	54%,
+	100% {
+		opacity: 0.22;
+	}
+}
+
+[data-ui='terminal'] .term-caret-blink {
+	animation: term-caret-blink 1.06s ease-in-out infinite;
+	box-shadow: 0 0 10px -2px color-mix(in srgb, var(--t-accent) 55%, transparent);
+}
+
+[data-ui='terminal'] .term-caret-solid {
+	box-shadow: 0 0 10px -2px color-mix(in srgb, var(--t-accent) 55%, transparent);
+}
+
+/* Active prompt subtle left rail & focus wash (zero layout shift) */
+[data-ui='terminal'] .term-prompt-line {
+	border-left: 2px solid transparent;
+	padding-left: 10px;
+	margin-left: -12px;
+	transition:
+		border-color 180ms ease,
+		background-color 180ms ease;
+}
+
+[data-ui='terminal'] .term-prompt-line.term-prompt-focused {
+	border-left-color: var(--t-accent);
+	background-color: color-mix(in srgb, var(--t-accent) 5%, transparent);
+}
+
+/* Cursor-tracking radial spotlight sheen for interactive cards & chips */
+[data-ui='terminal'] .term-spotlight {
+	position: relative;
+	overflow: hidden;
+	transition:
+		border-color 180ms ease,
+		background-color 180ms ease,
+		box-shadow 200ms ease;
+}
+
+[data-ui='terminal'] .term-spotlight::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	opacity: 0;
+	background: radial-gradient(
+		220px circle at var(--mx, 50%) var(--my, 50%),
+		color-mix(in srgb, var(--spot-color, var(--t-accent)) 14%, transparent),
+		transparent 70%
+	);
+	transition: opacity 200ms ease;
+}
+
+[data-ui='terminal'] .term-spotlight:hover::after,
+[data-ui='terminal'] .term-spotlight:focus-visible::after {
+	opacity: 1;
+}
+
+[data-ui='terminal'] .term-spotlight:hover,
+[data-ui='terminal'] .term-spotlight:focus-visible {
+	border-color: color-mix(in srgb, var(--spot-color, var(--t-accent)) 75%, var(--t-border));
+	background-color: color-mix(in srgb, var(--spot-color, var(--t-accent)) 6%, var(--t-surface));
+	box-shadow: 0 8px 24px -14px color-mix(in srgb, var(--spot-color, var(--t-accent)) 45%, transparent);
+}
+
+/* Semantic skill category panels & chips (driven by --cat-color) */
+[data-ui='terminal'] .term-cat-panel {
+	border-color: color-mix(in srgb, var(--cat-color, var(--t-border)) 32%, var(--t-border));
+	background-color: color-mix(in srgb, var(--cat-color, var(--t-surface)) 3%, transparent);
+	transition: border-color 180ms ease;
+}
+
+[data-ui='terminal'] .term-cat-panel:hover {
+	border-color: color-mix(in srgb, var(--cat-color, var(--t-border)) 58%, var(--t-border));
+}
+
+[data-ui='terminal'] .term-skill-chip {
+	border-color: var(--t-border);
+	background-color: var(--t-surface);
+	transition:
+		border-color 150ms ease,
+		background-color 150ms ease,
+		color 150ms ease,
+		transform 150ms var(--t-ease-out);
+}
+
+[data-ui='terminal'] .term-skill-chip:hover {
+	border-color: color-mix(in srgb, var(--cat-color, var(--t-accent)) 75%, var(--t-border));
+	background-color: color-mix(in srgb, var(--cat-color, var(--t-accent)) 12%, var(--t-surface));
+	color: var(--cat-color, var(--t-accent));
+	transform: translateY(-1px);
+}
+
+/* TreeList chromatic row hover (keeps semantic status colors legible) */
+[data-ui='terminal'] .term-tree-row {
+	border-left: 2px solid transparent;
+	transition:
+		background-color 150ms ease,
+		border-color 150ms ease;
+}
+
+[data-ui='terminal'] .term-tree-row:hover,
+[data-ui='terminal'] .term-tree-row:focus-within {
+	border-left-color: var(--t-accent);
+	background-color: color-mix(in srgb, var(--t-accent) 10%, var(--t-surface));
+}
+
+/* Live pulsing status indicator */
+@keyframes term-ping {
+	0% {
+		transform: scale(1);
+		opacity: 0.75;
+	}
+	75%,
+	100% {
+		transform: scale(2.4);
+		opacity: 0;
+	}
+}
+
+[data-ui='terminal'] .term-pulse-dot {
+	position: relative;
+	display: inline-flex;
+	width: 7px;
+	height: 7px;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+[data-ui='terminal'] .term-pulse-dot::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-color: var(--dot-color, var(--t-ok));
+	animation: term-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+[data-ui='terminal'] .term-pulse-dot::after {
+	content: '';
+	position: relative;
+	width: 7px;
+	height: 7px;
+	background-color: var(--dot-color, var(--t-ok));
+}
+
+/* Copy confirmation micro-pop */
+@keyframes term-pop {
+	0% {
+		transform: scale(0.8);
+	}
+	60% {
+		transform: scale(1.15);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+[data-ui='terminal'] .term-copy-pop {
+	animation: term-pop 200ms var(--t-ease-out);
+}
+
+/* Technical corner reticle frame for /contact portrait */
+[data-ui='terminal'] .term-reticle {
+	position: relative;
+	transition:
+		border-color 200ms ease,
+		box-shadow 220ms ease;
+}
+
+[data-ui='terminal'] .term-reticle:hover {
+	border-color: color-mix(in srgb, var(--t-accent) 65%, var(--t-border));
+	box-shadow: 0 10px 28px -16px color-mix(in srgb, var(--t-accent) 45%, transparent);
+}
+
+[data-ui='terminal'] .term-reticle-corner {
+	position: absolute;
+	width: 9px;
+	height: 9px;
+	pointer-events: none;
+	border-color: var(--t-accent);
+	opacity: 0.72;
+	transition:
+		opacity 180ms ease,
+		width 180ms var(--t-ease-out),
+		height 180ms var(--t-ease-out);
+}
+
+[data-ui='terminal'] .term-reticle:hover .term-reticle-corner {
+	opacity: 1;
+	width: 12px;
+	height: 12px;
+}
+
+/* Timeline vertical gradient rail */
+[data-ui='terminal'] .term-timeline-rail {
+	border-left: 1px solid transparent;
+	border-image: linear-gradient(
+			to bottom,
+			var(--t-accent) 0%,
+			color-mix(in srgb, var(--t-info) 45%, var(--t-border)) 30%,
+			var(--t-border) 100%
+		)
+		1;
+}
+
+/* Subtle echo prompt glyph highlight */
+[data-ui='terminal'] .term-echo-dollar {
+	text-shadow: 0 0 12px color-mix(in srgb, var(--t-accent) 45%, transparent);
+}
+
+/* CSS-only staggered boot sequence (4 lines + thin progress bar, ~1.1s total) */
+@keyframes boot-step-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes boot-progress {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}
+
+[data-ui='terminal'] .boot-line {
+	animation: boot-step-in 1ms steps(1) backwards;
+	animation-delay: calc(var(--i, 0) * 200ms);
+}
+
+[data-ui='terminal'] .boot-progress-fill {
+	transform-origin: left center;
+	background: linear-gradient(90deg, var(--t-accent), var(--t-info), var(--t-ok));
+	animation: boot-progress 920ms var(--t-ease-out) forwards;
+}
+
+/* Boot overlay: explicit zero margin overrides Tailwind v4 space-y-* margin-block-end so footer is 100% covered */
+[data-ui='terminal'] .term-boot-overlay {
+	margin: 0 !important;
+	inset: 0;
+	width: 100vw;
+	height: 100dvh;
+	z-index: 60;
+}
+
+/* Pre-hydration and post-boot state hides overlay immediately without flash */
+html[data-booted] .term-boot-overlay {
+	display: none !important;
+}
+
+html[data-booted] .boot-line,
+html[data-booted] .boot-progress-fill {
+	animation: none;
+}
+
+/* Reduced motion: disable spatial motion, infinite loops, boot overlay, and radial wipe while preserving color/state clarity */
+@media (prefers-reduced-motion: reduce) {
+	.term-boot-overlay,
+	[data-ui='terminal'] .term-bg-sweep,
+	[data-ui='terminal'] .term-bg-cursor-glow,
+	[data-ui='terminal'] .term-bg-cursor-dots {
+		display: none !important;
+	}
+
+	html.term-theme-transition::view-transition-new(root),
+	html.term-theme-transition::view-transition-old(root) {
+		animation: none !important;
+	}
+
+	[data-ui='terminal'] .term-bg-aurora,
+	[data-ui='terminal'] .term-enter,
+	[data-ui='terminal'] .term-stagger,
+	[data-ui='terminal'] .term-caret-blink,
+	[data-ui='terminal'] .term-pulse-dot::before,
+	[data-ui='terminal'] .term-copy-pop,
+	[data-ui='terminal'] .boot-line,
+	[data-ui='terminal'] .boot-progress-fill {
+		animation: none !important;
+	}
+
+	[data-ui='terminal'] .term-bg-aurora {
+		opacity: 0.85 !important;
+	}
+
+	[data-ui='terminal'] .term-pulse-dot::before {
+		display: none;
+	}
+
+	[data-ui='terminal'] * {
+		scroll-behavior: auto !important;
+		transition-property: color, background-color, border-color, opacity !important;
+		transition-duration: 120ms !important;
+	}
+
+	[data-ui='terminal'] .term-skill-chip:hover {
+		transform: none !important;
+	}
+}
+
+/* Print stylesheet (design.md section 15) */
+@media print {
+	:root:has([data-ui='terminal']),
+	:root:has([data-ui='terminal']) body,
+	[data-ui='terminal'] {
+		color-scheme: light !important;
+		background: #ffffff !important;
+		color: #000000 !important;
+		transition: none !important;
+		--t-bg: #ffffff;
+		--t-surface: #ffffff;
+		--t-border: #000000;
+		--t-fg: #000000;
+		--t-muted: #333333;
+		--t-faint: #555555;
+		--t-accent: #000000;
+		--t-info: #000000;
+		--t-ok: #000000;
+		--t-warn: #000000;
+		--t-danger: #000000;
+		--t-special: #000000;
+	}
+
+	[data-ui='terminal'] .term-bg-stage {
+		display: none !important;
+	}
+
+	[data-ui='terminal'] .term-dock,
+	[data-ui='terminal'] .term-prompt-line,
+	[data-ui='terminal'] .term-skip-link,
+	.term-boot-overlay {
+		display: none !important;
+	}
+
+	[data-ui='terminal'] a[href^='http']::after {
+		content: ' (' attr(href) ')';
+		font-size: 12px;
+		color: #333333;
+		word-break: break-all;
+	}
+
+	[data-ui='terminal'] dl,
+	[data-ui='terminal'] .term-log-entry,
+	[data-ui='terminal'] fieldset,
+	[data-ui='terminal'] pre {
+		break-inside: avoid;
+		page-break-inside: avoid;
+	}
+}

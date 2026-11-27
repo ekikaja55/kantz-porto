@@ -8,6 +8,13 @@
       "when": 1794998710133,
       "tag": "0000_military_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795614378187,
+      "tag": "0001_remarkable_kronos",
+      "breakpoints": true
     }
   ]
 }

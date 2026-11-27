@@ -14,7 +14,6 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const name = formData.get('name')?.toString().trim();
 		const category = formData.get('category')?.toString().trim() || 'languages';
-		const icon = formData.get('icon')?.toString().trim() || null;
 		const orderIndex = parseInt(formData.get('orderIndex')?.toString() || '0', 10);
 
 		if (!name) {
@@ -25,7 +24,6 @@ export const actions: Actions = {
 			await createSkill({
 				category,
 				name,
-				icon,
 				orderIndex
 			});
 			return { success: true };
@@ -40,7 +38,6 @@ export const actions: Actions = {
 		const id = formData.get('id')?.toString();
 		const name = formData.get('name')?.toString().trim();
 		const category = formData.get('category')?.toString().trim();
-		const icon = formData.get('icon')?.toString().trim() || null;
 		const orderIndex = parseInt(formData.get('orderIndex')?.toString() || '0', 10);
 
 		if (!id || !name || !category) {
@@ -51,7 +48,6 @@ export const actions: Actions = {
 			await updateSkill(id, {
 				name,
 				category,
-				icon,
 				orderIndex
 			});
 			return { success: true };

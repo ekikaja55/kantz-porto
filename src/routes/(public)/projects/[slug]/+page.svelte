@@ -1,186 +1,161 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
 	import { resolve } from '$app/paths';
-	import { i18n } from '#lib/i18n/index.svelte';
-	import Footer from '#lib/components/Footer.svelte';
+	import { page } from '$app/state';
+	import OutputBlock from '#lib/components/terminal/OutputBlock.svelte';
+	import KeyValue, { type KeyValueItem } from '#lib/components/terminal/KeyValue.svelte';
+	import Tag from '#lib/components/terminal/Tag.svelte';
+	import Markdown from '#lib/components/terminal/Markdown.svelte';
+	import ImageViewer from '#lib/components/terminal/ImageViewer.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
-	const statusLabel = $derived.by(() => {
-		switch (data.project.status) {
-			case 'live':
-				return i18n.t.projects.statusLive;
-			case 'in_progress':
-				return i18n.t.projects.statusWip;
-			default:
-				return i18n.t.projects.statusArchived;
+	function statusRole(status: string): 'ok' | 'warn' | 'muted' {
+		const normalized = status.toLowerCase();
+		if (normalized === 'live') return 'ok';
+		if (normalized === 'wip' || normalized === 'in_progress' || normalized === 'in-progress') {
+			return 'warn';
 		}
-	});
+		return 'muted';
+	}
 
-	const statusColor = $derived.by(() => {
-		switch (data.project.status) {
-			case 'live':
-				return 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/40 dark:border-emerald-800';
-			case 'in_progress':
-				return 'text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950/40 dark:border-amber-800';
-			default:
-				return 'text-neutral-700 bg-neutral-100 border-neutral-200 dark:text-neutral-400 dark:bg-neutral-900 dark:border-neutral-800';
-		}
-	});
+	function statusBorderClass(status: string): string {
+		const role = statusRole(status);
+		if (role === 'ok') return 'border-t-term-ok';
+		if (role === 'warn') return 'border-t-term-warn';
+		return 'border-t-term-accent';
+	}
+
+	function formatUrlLabel(url: string): string {
+		return url.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+	}
+
+	let linkItems = $derived<KeyValueItem[]>([
+		...(data.project.liveUrl
+			? [
+					{
+						key: 'live',
+						value: formatUrlLabel(data.project.liveUrl),
+						href: data.project.liveUrl,
+						external: true
+					}
+				]
+			: []),
+		...(data.project.githubUrl
+			? [
+					{
+						key: 'source',
+						value: formatUrlLabel(data.project.githubUrl),
+						href: data.project.githubUrl,
+						external: true
+					}
+				]
+			: [])
+	]);
 </script>
 
 <svelte:head>
-	<title>{data.project.title} — Case Study | Kantz</title>
+	<title>{data.project.title} | kantZ Workstation</title>
 	<meta name="description" content={data.project.tagline} />
+	<meta property="og:title" content="{data.project.title} | kantZ Workstation" />
+	<meta property="og:description" content={data.project.tagline} />
+	<meta
+		property="og:image"
+		content={data.project.thumbnailUrl || `${page.url.origin}/og-default.png`}
+	/>
 </svelte:head>
 
-<article class="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-	<!-- Top Navigation -->
-	<div class="flex items-center justify-between border-b border-neutral-200/80 pb-6 dark:border-neutral-800/80">
-		<a
-			href={resolve('/(public)/projects')}
-			class="inline-flex items-center gap-1.5 text-xs font-mono text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+<OutputBlock command="open {data.project.slug}">
+	<article class="space-y-6">
+		<div
+			class="font-term-mono text-[15px] md:text-[17px] leading-[1.5] text-term-muted flex items-center justify-between border-b border-term-border pb-2.5"
 		>
-			<Icon icon="solar:arrow-left-bold-duotone" class="size-3.5" />
-			<span>{i18n.t.common.back}</span>
-		</a>
-
-		<div class="flex items-center gap-2">
-			<span class="rounded-md bg-neutral-100 px-2 py-0.5 text-xs font-mono font-medium text-neutral-700 uppercase tracking-wider dark:bg-neutral-800 dark:text-neutral-300">
-				{data.project.category}
-			</span>
-			<span class={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusColor}`}>
-				<span class="size-1.5 rounded-full bg-current"></span>
-				<span>{statusLabel}</span>
-			</span>
-		</div>
-	</div>
-
-	<!-- Header Content -->
-	<header class="mt-8">
-		<h1 class="font-display text-3xl font-extrabold tracking-tight text-neutral-900 sm:text-4xl lg:text-5xl dark:text-white">
-			{data.project.title}
-		</h1>
-		<p class="mt-4 text-lg leading-relaxed text-neutral-600 dark:text-neutral-300">
-			{data.project.tagline}
-		</p>
-
-		<!-- Action Links -->
-		<div class="mt-6 flex flex-wrap items-center gap-3">
-			{#if data.project.liveUrl}
-				<a
-					href={data.project.liveUrl}
-					target="_blank"
-					rel="external noopener noreferrer"
-					class="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-xs transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+			<a
+				href={resolve('/(public)/projects')}
+				class="group min-h-[44px] sm:min-h-0 inline-flex items-center gap-1 text-term-info underline hover:text-term-accent"
+			>
+				<span class="inline-block transition-transform duration-150 group-hover:-translate-x-0.5"
+					>[&lt;</span
 				>
-					<Icon icon="solar:arrow-right-up-bold-duotone" class="size-4" />
-					<span>{i18n.t.projects.liveDemo}</span>
-				</a>
-			{/if}
-
-			{#if data.project.githubUrl}
-				<a
-					href={data.project.githubUrl}
-					target="_blank"
-					rel="external noopener noreferrer"
-					class="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 shadow-xs transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
-				>
-					<Icon icon="solar:code-file-bold-duotone" class="size-4" />
-					<span>{i18n.t.projects.sourceCode}</span>
-				</a>
-			{/if}
-		</div>
-
-		<!-- Technologies Matrix -->
-		{#if data.project.technologies && data.project.technologies.length > 0}
-			<div class="mt-8 rounded-xl border border-neutral-200 bg-neutral-50/70 p-4 dark:border-neutral-800 dark:bg-neutral-900/40">
-				<span class="text-xs font-mono uppercase text-neutral-500">Core Technologies:</span>
-				<div class="mt-2 flex flex-wrap gap-2">
-					{#each data.project.technologies as tech (tech)}
-						<span class="rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-mono text-neutral-700 shadow-xs dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
-							{tech}
-						</span>
-					{/each}
-				</div>
+				<span>projects]</span>
+			</a>
+			<div class="flex items-center gap-4">
+				{#if data.prevProject}
+					<a
+						href={resolve('/(public)/projects/[slug]', { slug: data.prevProject.slug })}
+						class="group min-h-[44px] sm:min-h-0 inline-flex items-center gap-1 text-term-info underline hover:text-term-accent"
+						title={data.prevProject.title}
+					>
+						<span
+							class="inline-block transition-transform duration-150 group-hover:-translate-x-0.5"
+							>[&lt;</span
+						>
+						<span>prev]</span>
+					</a>
+				{/if}
+				{#if data.nextProject}
+					<a
+						href={resolve('/(public)/projects/[slug]', { slug: data.nextProject.slug })}
+						class="group min-h-[44px] sm:min-h-0 inline-flex items-center gap-1 text-term-info underline hover:text-term-accent"
+						title={data.nextProject.title}
+					>
+						<span>[next</span>
+						<span class="inline-block transition-transform duration-150 group-hover:translate-x-0.5"
+							>&gt;]</span
+						>
+					</a>
+				{/if}
 			</div>
-		{/if}
+		</div>
+
+		<header class="space-y-1.5">
+			<h1 class="font-term-mono text-[24px] md:text-[28px] leading-[1.3] font-bold text-term-fg">
+				{data.project.title}
+			</h1>
+			<p class="font-term-mono text-[16px] md:text-[18px] leading-[1.6] text-term-muted">
+				{data.project.tagline}
+			</p>
+		</header>
+
+		<div
+			class="border border-term-border border-t-2 {statusBorderClass(
+				data.project.status
+			)} bg-term-surface/70 px-4 sm:px-5 py-4"
+		>
+			<KeyValue items={linkItems}>
+				<div class="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-x-4 gap-y-0.5">
+					<dt class="text-term-muted">status</dt>
+					<dd>
+						<Tag text={data.project.status} role={statusRole(data.project.status)} />
+					</dd>
+				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-x-4 gap-y-0.5">
+					<dt class="text-term-muted">tier</dt>
+					<dd class="text-term-fg">T{data.project.tier}</dd>
+				</div>
+				<div class="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-x-4 gap-y-0.5">
+					<dt class="text-term-muted">category</dt>
+					<dd class="text-term-special lowercase">{data.project.category}</dd>
+				</div>
+				{#if data.project.technologies && data.project.technologies.length > 0}
+					<div class="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-x-4 gap-y-0.5">
+						<dt class="text-term-muted">stack</dt>
+						<dd class="flex flex-wrap gap-2 items-center">
+							{#each data.project.technologies as tech (tech)}
+								<Tag text={tech} role="special" />
+							{/each}
+						</dd>
+					</div>
+				{/if}
+			</KeyValue>
+		</div>
 
 		{#if data.project.images && data.project.images.length > 0}
-			<div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-				{#each data.project.images as imgUrl, idx (imgUrl)}
-					<div class="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100 shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
-						<img
-							src={imgUrl}
-							alt={`${data.project.title} screenshot ${idx + 1}`}
-							loading="lazy"
-							decoding="async"
-							class="aspect-video w-full object-cover transition-transform duration-300 hover:scale-105"
-						/>
-					</div>
-				{/each}
-			</div>
-		{/if}
-	</header>
-
-	<!-- Technical Case Study Content -->
-	<section class="mt-12 border-t border-neutral-200/80 pt-8 dark:border-neutral-800/80">
-		<div class="prose prose-neutral dark:prose-invert max-w-none text-neutral-800 dark:text-neutral-200 space-y-4">
-			{#each data.project.description.split('\n\n') as paragraph, pIdx (pIdx)}
-				{#if paragraph.startsWith('### ')}
-					<h2 class="font-display text-xl font-bold text-neutral-900 dark:text-white mt-8 mb-3">
-						{paragraph.replace('### ', '')}
-					</h2>
-				{:else if paragraph.startsWith('- ')}
-					<ul class="list-disc pl-5 space-y-1.5 text-sm leading-relaxed">
-						{#each paragraph.split('\n') as item, iIdx (iIdx)}
-							<li>{item.replace('- ', '')}</li>
-						{/each}
-					</ul>
-				{:else}
-					<p class="text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
-						{paragraph}
-					</p>
-				{/if}
-			{/each}
-		</div>
-	</section>
-
-	<!-- Next / Previous Navigation -->
-	<nav aria-label="Project Navigation" class="mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-neutral-200/80 pt-8 dark:border-neutral-800/80">
-		{#if data.prevProject}
-			<a
-				href={resolve('/(public)/projects/[slug]', { slug: data.prevProject.slug })}
-				class="flex flex-col rounded-xl border border-neutral-200 p-4 transition-all hover:border-neutral-300 hover:shadow-xs dark:border-neutral-800 dark:hover:border-neutral-700"
-			>
-				<span class="inline-flex items-center gap-1 text-xs font-mono text-neutral-500">
-					<Icon icon="solar:arrow-left-bold-duotone" class="size-3.5" />
-					<span>Previous Project</span>
-				</span>
-				<span class="mt-1 font-display text-base font-semibold text-neutral-900 dark:text-white">
-					{data.prevProject.title}
-				</span>
-			</a>
-		{:else}
-			<div></div>
+			<ImageViewer images={data.project.images} title={data.project.title} />
 		{/if}
 
-		{#if data.nextProject}
-			<a
-				href={resolve('/(public)/projects/[slug]', { slug: data.nextProject.slug })}
-				class="flex flex-col sm:items-end rounded-xl border border-neutral-200 p-4 transition-all hover:border-neutral-300 hover:shadow-xs dark:border-neutral-800 dark:hover:border-neutral-700 text-left sm:text-right"
-			>
-				<span class="inline-flex items-center gap-1 text-xs font-mono text-neutral-500">
-					<span>Next Project</span>
-					<Icon icon="solar:arrow-right-bold-duotone" class="size-3.5" />
-				</span>
-				<span class="mt-1 font-display text-base font-semibold text-neutral-900 dark:text-white">
-					{data.nextProject.title}
-				</span>
-			</a>
-		{/if}
-	</nav>
-</article>
-
-<Footer />
+		<section>
+			<Markdown content={data.project.description} />
+		</section>
+	</article>
+</OutputBlock>

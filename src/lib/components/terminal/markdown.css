@@ -1,0 +1,149 @@
+/* Scoped markdown styles for Terminal UI (.md) */
+[data-ui='terminal'] .md {
+	font-family: var(--font-term-sans);
+	font-size: 17px;
+	line-height: 1.7;
+	color: var(--t-fg);
+	max-width: 72ch;
+}
+
+@media (min-width: 768px) {
+	[data-ui='terminal'] .md {
+		font-size: 19px;
+	}
+}
+
+[data-ui='terminal'] .md p {
+	margin-bottom: 1em;
+	text-wrap: pretty;
+}
+
+[data-ui='terminal'] .md p:last-child {
+	margin-bottom: 0;
+}
+
+[data-ui='terminal'] .md strong {
+	font-weight: 600;
+}
+
+[data-ui='terminal'] .md h3,
+[data-ui='terminal'] .md h4 {
+	font-family: var(--font-term-mono);
+	font-weight: 700;
+	line-height: 1.35;
+	text-wrap: balance;
+}
+
+[data-ui='terminal'] .md h3 {
+	font-size: 20px;
+	color: var(--t-fg);
+	margin-top: 1.8em;
+	margin-bottom: 0.55em;
+	padding-bottom: 0.25em;
+	border-bottom: 1px solid var(--t-border);
+}
+
+[data-ui='terminal'] .md h4 {
+	font-size: 17px;
+	color: var(--t-accent);
+	margin-top: 1.4em;
+	margin-bottom: 0.45em;
+}
+
+@media (min-width: 768px) {
+	[data-ui='terminal'] .md h3 {
+		font-size: 22px;
+	}
+
+	[data-ui='terminal'] .md h4 {
+		font-size: 19px;
+	}
+}
+
+[data-ui='terminal'] .md code {
+	font-family: var(--font-term-mono);
+	font-size: 15px;
+	line-height: 1.6;
+	padding: 0.1em 0.35em;
+	background-color: var(--t-surface);
+	border: 1px solid var(--t-border);
+}
+
+[data-ui='terminal'] .md pre {
+	counter-reset: line;
+	font-family: var(--font-term-mono);
+	font-size: 15px;
+	line-height: 1.6;
+	padding: 0.9em 1.1em;
+	background-color: var(--t-surface);
+	border: 1px solid var(--t-border);
+	overflow-x: auto;
+	margin-bottom: 1.1em;
+}
+
+@media (min-width: 768px) {
+	[data-ui='terminal'] .md code,
+	[data-ui='terminal'] .md pre {
+		font-size: 16px;
+	}
+}
+
+[data-ui='terminal'] .md pre code {
+	display: block;
+	padding: 0;
+	background-color: transparent;
+	border: none;
+}
+
+[data-ui='terminal'] .md pre code span {
+	display: block;
+	counter-increment: line;
+	min-height: 1.6em;
+}
+
+[data-ui='terminal'] .md pre code span::before {
+	content: counter(line);
+	display: inline-block;
+	width: 2.5em;
+	padding-right: 0.75em;
+	margin-right: 0.75em;
+	color: var(--t-faint);
+	text-align: right;
+	border-right: 1px solid var(--t-border);
+	user-select: none;
+}
+
+[data-ui='terminal'] .md a {
+	color: var(--t-info);
+	text-decoration: underline;
+}
+
+[data-ui='terminal'] .md a:hover {
+	color: var(--t-accent);
+}
+
+[data-ui='terminal'] .md ul,
+[data-ui='terminal'] .md ol {
+	padding-left: 1.5em;
+	margin-bottom: 1em;
+}
+
+[data-ui='terminal'] .md ul {
+	list-style-type: disc;
+}
+
+[data-ui='terminal'] .md ol {
+	list-style-type: decimal;
+}
+
+[data-ui='terminal'] .md li {
+	margin-bottom: 0.3em;
+}
+
+[data-ui='terminal'] .md blockquote {
+	border-left: 2px solid var(--t-accent);
+	padding-left: 1em;
+	margin-left: 0;
+	margin-bottom: 1em;
+	color: var(--t-muted);
+}

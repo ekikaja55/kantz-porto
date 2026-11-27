@@ -43,7 +43,6 @@ export const skills = pgTable(
 			.$defaultFn(() => crypto.randomUUID()),
 		category: text('category').notNull(), // 'languages' | 'frameworks' | 'databases' | 'systems'
 		name: text('name').notNull(),
-		icon: text('icon'),
 		orderIndex: integer('order_index').notNull().default(0),
 		createdAt: timestamp('created_at').defaultNow().notNull()
 	},

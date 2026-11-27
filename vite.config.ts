@@ -6,6 +6,11 @@ import adapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
+	define: {
+		__APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '0.0.1'),
+		__COMMIT__: JSON.stringify((process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev').slice(0, 7)),
+		__BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10))
+	},
 	plugins: [
 		enhancedImages(),
 		tailwindcss(),
@@ -41,7 +46,8 @@ export default defineConfig({
 					name: 'server',
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+					fileParallelism: false
 				}
 			}
 		]

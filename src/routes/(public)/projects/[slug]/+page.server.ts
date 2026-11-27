@@ -1,18 +1,15 @@
 import { error } from '@sveltejs/kit';
+import { PUBLIC_PAGE_CACHE_HEADERS } from '#lib/server/cache';
 import { getProjectBySlug, getAllProjects } from '#lib/server/projects';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
-	setHeaders({
-		'cache-control': 'public, s-maxage=3600, stale-while-revalidate=86400'
-	});
+	setHeaders(PUBLIC_PAGE_CACHE_HEADERS);
 
 	const project = await getProjectBySlug(params.slug);
 
 	if (!project) {
-		throw error(404, {
-			message: `Project with slug "${params.slug}" was not found.`
-		});
+		error(404, `open: no such project: ${params.slug}`);
 	}
 
 	const allProjects = await getAllProjects();

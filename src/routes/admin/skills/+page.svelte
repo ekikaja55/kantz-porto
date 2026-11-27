@@ -118,7 +118,7 @@
 			<div class="flex items-center justify-between rounded-xl border border-neutral-200/90 bg-white p-4 shadow-xs transition-all hover:border-neutral-300 dark:border-neutral-800/90 dark:bg-neutral-900/60 dark:hover:border-neutral-700">
 				<div class="flex items-center gap-3">
 					<div class="flex size-9 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
-						<Icon icon={skill.icon || 'solar:code-square-bold-duotone'} class="size-4.5 text-neutral-700 dark:text-neutral-300" />
+						<Icon icon="solar:code-square-bold-duotone" class="size-4.5 text-neutral-700 dark:text-neutral-300" />
 					</div>
 					<div>
 						<h3 class="font-semibold text-sm text-neutral-900 dark:text-white">{skill.name}</h3>
@@ -204,19 +204,6 @@
 					<option value="databases">Databases & Infrastructure</option>
 					<option value="systems">Systems & Tooling</option>
 				</select>
-			</div>
-
-			<div>
-				<label for="new-skill-icon" class="block text-xs font-semibold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">
-					Solar Icon Identifier (Optional)
-				</label>
-				<input
-					type="text"
-					id="new-skill-icon"
-					name="icon"
-					placeholder="solar:code-file-bold-duotone"
-					class="mt-1 w-full rounded-lg border border-neutral-200 bg-white py-2 px-3 font-mono text-xs text-neutral-900 focus:border-neutral-500 focus:outline-hidden dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
-				/>
 			</div>
 
 			<div>
@@ -307,19 +294,6 @@
 						<option value="databases">Databases & Infrastructure</option>
 						<option value="systems">Systems & Tooling</option>
 					</select>
-				</div>
-
-				<div>
-					<label for="edit-skill-icon" class="block text-xs font-semibold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">
-						Solar Icon Identifier
-					</label>
-					<input
-						type="text"
-						id="edit-skill-icon"
-						name="icon"
-						value={editingSkill.icon || ''}
-						class="mt-1 w-full rounded-lg border border-neutral-200 bg-white py-2 px-3 font-mono text-xs text-neutral-900 focus:border-neutral-500 focus:outline-hidden dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
-					/>
 				</div>
 
 				<div>

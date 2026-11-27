@@ -1,9 +1,38 @@
 <!doctype html>
-<html lang="%lang%">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
 		<meta name="text-scale" content="scale" />
+		<meta name="theme-color" content="#080808" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<script>
+			(function () {
+				var d = document.documentElement;
+				d.setAttribute('data-term-theme', 'moonfly');
+				try {
+					if (localStorage.getItem('kantz-theme') === 'ayu')
+						d.setAttribute('data-term-theme', 'ayu');
+					if (localStorage.getItem('kantz-nav') === 'closed')
+						d.setAttribute('data-nav', 'closed');
+					if (sessionStorage.getItem('kantz-booted') === '1')
+						d.setAttribute('data-booted', '1');
+				} catch (e) {
+					// Ignore storage errors in private browsing modes
+				}
+			})();
+		</script>
+		<noscript>
+			<style>
+				.term-boot-overlay {
+					display: none !important;
+				}
+				.motd-line,
+				.boot-line {
+					animation: none !important;
+				}
+			</style>
+		</noscript>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover" class="bg-neutral-50 text-neutral-900 transition-colors duration-200 dark:bg-neutral-950 dark:text-neutral-100 font-sans antialiased">

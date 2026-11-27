@@ -4,6 +4,8 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Icon from '@iconify/svelte';
+	import NavigationProgress from '#lib/components/NavigationProgress.svelte';
+	import ToastContainer from '#lib/components/ToastContainer.svelte';
 
 	interface Props {
 		data: LayoutData;
@@ -32,6 +34,8 @@
 </script>
 
 <div class="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 font-sans">
+	<NavigationProgress />
+	<ToastContainer />
 	<!-- Mobile Top Bar with Hamburger -->
 	<div class="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-neutral-200/90 bg-white/90 px-4 backdrop-blur-md md:hidden dark:border-neutral-800/90 dark:bg-neutral-900/90">
 		<button
