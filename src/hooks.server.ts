@@ -1,35 +1,12 @@
 import type { Handle } from '@sveltejs/kit/hooks';
 import { sequence } from '@sveltejs/kit/hooks';
-import { building } from '$app/env';
+import { building, dev } from '$app/env';
 import { auth } from '#lib/server/auth.ts';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 import { recordPageView } from '#lib/server/redis.ts';
 import { createLogger } from '#lib/utils/logger.ts';
-import type { Language } from '#lib/i18n';
 
 const log = createLogger('Hooks');
-
-const handleI18n: Handle = async ({ event, resolve }) => {
-	const { pathname } = event.url;
-	const segments = pathname.split('/').filter(Boolean);
-	const firstSegment = segments[0] as Language | undefined;
-
-	if (firstSegment === 'id' || firstSegment === 'en') {
-		event.locals.lang = firstSegment;
-	} else {
-		const cookieLang = event.cookies.get('lang') as Language | undefined;
-		if (cookieLang === 'id' || cookieLang === 'en') {
-			event.locals.lang = cookieLang;
-		} else {
-			const acceptLang = event.request.headers.get('accept-language');
-			event.locals.lang = acceptLang?.toLowerCase().startsWith('id') ? 'id' : 'en';
-		}
-	}
-
-	return resolve(event, {
-		transformPageChunk: ({ html }) => html.replace('%lang%', event.locals.lang || 'en')
-	});
-};
 
 const handleAnalytics: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
@@ -43,7 +20,7 @@ const handleAnalytics: Handle = async ({ event, resolve }) => {
 		pathname.includes('.') ||
 		pathname.startsWith('/favicon');
 
-	if (isGet && !isAssetOrSystem) {
+	if (!dev && isGet && !isAssetOrSystem) {
 		let clientIp = '127.0.0.1';
 		try {
 			clientIp =
@@ -65,15 +42,28 @@ const handleAnalytics: Handle = async ({ event, resolve }) => {
 };
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
-	const session = await auth.api.getSession({ headers: event.request.headers });
+	const { pathname } = event.url;
+	const isAuthScoped =
+		pathname.startsWith('/admin') ||
+		pathname === '/login' ||
+		pathname.startsWith('/login/') ||
+		pathname.startsWith('/api/auth') ||
+		pathname === '/api/upload' ||
+		pathname.startsWith('/api/upload/');
 
-	if (session) {
-		event.locals.session = session.session;
-		event.locals.user = session.user;
-		log.debug(`Authenticated session resolved for user: ${session.user.email}`);
+	if (isAuthScoped) {
+		const session = await auth.api.getSession({ headers: event.request.headers });
+
+		if (session) {
+			event.locals.session = session.session;
+			event.locals.user = session.user;
+			log.debug(`Authenticated session resolved for user: ${session.user.email}`);
+		}
+
+		return svelteKitHandler({ event, resolve, auth, building });
 	}
 
-	return svelteKitHandler({ event, resolve, auth, building });
+	return resolve(event);
 };
 
-export const handle: Handle = sequence(handleI18n, handleAnalytics, handleBetterAuth);
+export const handle: Handle = sequence(handleAnalytics, handleBetterAuth);

@@ -1,9 +1,7 @@
 export interface ProfileData {
 	name: string;
 	alias: string;
-	birthPlace: string;
-	birthDate: string;
-	age: number;
+	photo: string;
 	education: {
 		institution: string;
 		status: string;
@@ -24,27 +22,23 @@ export interface ProfileData {
 		username: string;
 		link: string;
 	};
-	bio: {
-		en: string;
-		id: string;
-	};
+	bio: string;
 }
 
 export const PROFILE: ProfileData = {
 	name: 'Rizki Arkant Pratama',
 	alias: 'Kantz',
-	birthPlace: 'Denpasar',
-	birthDate: '2 Februari 2004',
-	age: 22,
+	photo: '/profile.jpeg',
 	education: {
 		institution: 'Institut Sains dan Teknologi Terpadu Surabaya (ISTTS)',
-		status: 'Mahasiswa Tingkat Akhir / Final Year Undergraduate',
+		status: 'Final Year Undergraduate',
 		website: 'https://istts.ac.id/'
 	},
 	roles: [
 		'Full-Stack Web Engineer',
 		'Coding Instructor & Practitioner',
-		'Software Architecture Enthusiast'
+		'Web & Systems Architect',
+		'Software Systems Builder'
 	],
 	email: 'rizkiarkant55@gmail.com',
 	whatsapp: {
@@ -60,8 +54,5 @@ export const PROFILE: ProfileData = {
 		username: 'ekikaja55',
 		link: 'https://github.com/ekikaja55'
 	},
-	bio: {
-		en: 'Final-year computer science undergraduate at ISTTS Surabaya, coding instructor, and freelance full-stack engineer specializing in performant web architecture with SvelteKit, TypeScript, and PostgreSQL.',
-		id: 'Mahasiswa tingkat akhir di Institut Sains dan Teknologi Terpadu Surabaya (ISTTS), praktisi pengajar coding, dan freelance full-stack engineer yang berfokus pada arsitektur web performa tinggi menggunakan SvelteKit, TypeScript, dan PostgreSQL.'
-	}
+	bio: 'Final-year computer science undergraduate at ISTTS Surabaya, coding instructor, and freelance full-stack engineer specializing in performant web architecture with SvelteKit, TypeScript, and PostgreSQL.'
 };

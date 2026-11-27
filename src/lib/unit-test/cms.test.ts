@@ -26,7 +26,6 @@ describe('CMS Capabilities & Milestones Operations', () => {
 			id: tempId,
 			name: 'Zig Systems',
 			category: 'languages',
-			icon: 'solar:code-file-bold-duotone',
 			orderIndex: 99
 		});
 

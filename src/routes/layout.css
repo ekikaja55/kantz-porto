@@ -8,8 +8,30 @@
 @import '@fontsource/syne/index.css';
 @import '@fontsource/geist-mono/index.css';
 
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-700.css';
+@import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-600.css';
+
 @theme {
 	--font-sans: 'Plus Jakarta Sans Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	--font-display: 'Syne', var(--font-sans);
 	--font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	--font-term-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	--font-term-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@theme inline {
+	--color-term-bg: var(--t-bg);
+	--color-term-surface: var(--t-surface);
+	--color-term-border: var(--t-border);
+	--color-term-fg: var(--t-fg);
+	--color-term-muted: var(--t-muted);
+	--color-term-faint: var(--t-faint);
+	--color-term-accent: var(--t-accent);
+	--color-term-info: var(--t-info);
+	--color-term-ok: var(--t-ok);
+	--color-term-warn: var(--t-warn);
+	--color-term-danger: var(--t-danger);
+	--color-term-special: var(--t-special);
 }

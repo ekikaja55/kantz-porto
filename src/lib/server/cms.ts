@@ -37,7 +37,6 @@ export async function getSkills(): Promise<Skill[]> {
 
 	return INITIAL_SKILLS.map((s) => ({
 		...s,
-		icon: s.icon ?? null,
 		createdAt: new Date()
 	}));
 }
@@ -53,7 +52,7 @@ export async function getSkillById(id: string): Promise<Skill | null> {
 	}
 
 	const fallback = INITIAL_SKILLS.find((s) => s.id === id);
-	return fallback ? { ...fallback, icon: fallback.icon ?? null, createdAt: new Date() } : null;
+	return fallback ? { ...fallback, createdAt: new Date() } : null;
 }
 
 export async function createSkill(data: Omit<NewSkill, 'id' | 'createdAt'> & { id?: string }): Promise<Skill> {

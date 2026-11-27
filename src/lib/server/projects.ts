@@ -189,3 +189,24 @@ export async function reorderProject(id: string, direction: 'up' | 'down'): Prom
 		return false;
 	}
 }
+
+export async function getProjectSlugs(): Promise<{ slug: string; title: string }[]> {
+	try {
+		await seedProjectsIfEmpty();
+		const result = await db
+			.select({ slug: projects.slug, title: projects.title })
+			.from(projects)
+			.where(eq(projects.isPublished, true))
+			.orderBy(asc(projects.orderIndex));
+
+		if (result && result.length > 0) {
+			return result;
+		}
+	} catch (error) {
+		log.warn('Project slugs query falling back to initial seed data:', error);
+	}
+
+	return initialProjects
+		.filter((p) => p.isPublished)
+		.map((p) => ({ slug: p.slug, title: p.title }));
+}

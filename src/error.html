@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>%sveltekit.status% | kantZ Workstation</title>
+		<style>
+			:root {
+				color-scheme: dark;
+			}
+			body {
+				margin: 0;
+				padding: 24px 16px;
+				background: #080808;
+				color: #bdbdbd;
+				font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			}
+			main {
+				max-width: 72ch;
+				margin: 0 auto;
+			}
+			.p {
+				color: #80a0ff;
+			}
+			.err {
+				color: #ff5454;
+			}
+			a {
+				color: #79dac8;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<p><span class="p">$</span> status %sveltekit.status%</p>
+			<p class="err">%sveltekit.error.message%</p>
+			<p><a href="/">return to about_me</a></p>
+		</main>
+	</body>
+</html>
